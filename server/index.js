@@ -22,31 +22,101 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'capacitor://localhost',
-      'http://localhost',
-      'ionic://localhost',
-      'https://billing-app-zct8.onrender.com',
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, native apps)
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost',
+        'https://billing-app-hazel.vercel.app',
+        'capacitor://localhost',
+        'ionic://localhost',
+        process.env.CLIENT_URL,
+      ].filter(Boolean);
+      
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // Allow any vercel.app subdomain
+      if (origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+      
+      // Allow all for Socket.io (more permissive)
+      return callback(null, true);
+    },
+    methods: ['GET', 'POST'],
     credentials: true,
-  }
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  },
+  transports: ['websocket', 'polling'],
+  allowEIO3: true,
 });
 
-// Middleware
+// Allowed origins for CORS
+const allowedOrigins = [
+  // Local development
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost',
+  'http://127.0.0.1:5173',
+  
+  // Vercel web app
+  'https://billing-app-hazel.vercel.app',
+  
+  // Capacitor mobile app origins
+  'capacitor://localhost',
+  'capacitor://billing-app-hazel.vercel.app',
+  'ionic://localhost',
+  'http://localhost:8080',
+  
+  // Dynamic from environment
+  process.env.CLIENT_URL,
+].filter(Boolean); // Remove any undefined values
+
+// CORS middleware with dynamic origin checking
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://annapoorna.vercel.app',
-    'capacitor://localhost',
-    'http://localhost',
-    'ionic://localhost',
-    'https://billing-app-zct8.onrender.com',
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow any vercel.app subdomain
+    if (origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // Allow any render.com subdomain
+    if (origin.endsWith('.onrender.com')) {
+      return callback(null, true);
+    }
+    
+    console.log('CORS blocked origin:', origin);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+  exposedHeaders: ['Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
+
+// Handle preflight requests for all routes
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
