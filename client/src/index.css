@@ -14,25 +14,72 @@
   --orange: #e65000;
 }
 
+/* Mobile App Global Styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
-body {
-  font-family: 'Work Sans', sans-serif;
+html, body {
+  overscroll-behavior: none;
+  overflow-x: hidden;
   background-color: var(--background);
-  color: var(--text-dark);
+  font-family: 'Work Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  color: var(--text-dark);
+}
+
 #root {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
   max-width: 430px;
   margin: 0 auto;
   background: var(--background);
+}
+
+/* Prevent text selection on UI elements */
+button, .no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Safe area for phones with notch */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fix bottom nav for phones with home bar */
+.bottom-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+}
+
+/* Smooth scrolling on iOS */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Remove iOS input styling */
+input, textarea {
+  -webkit-appearance: none;
+  border-radius: 12px;
+}
+
+/* Larger touch targets */
+button {
+  min-height: 52px;
+  cursor: pointer;
 }
 
 /* Custom scrollbar */

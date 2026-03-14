@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { SplashScreen } from '@capacitor/splash-screen';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
+import OfflineBanner from './components/OfflineBanner';
 
 // Pages
 import RoleSelection from './pages/RoleSelection';
@@ -141,11 +145,32 @@ function AppRoutes() {
   );
 }
 
+// Initialize mobile-specific features
+const initMobile = async () => {
+  if (!Capacitor.isNativePlatform()) return;
+  
+  try {
+    // Set status bar color to match brand
+    await StatusBar.setStyle({ style: Style.Light });
+    await StatusBar.setBackgroundColor({ color: '#e65000' });
+    
+    // Hide splash screen after app loads
+    await SplashScreen.hide();
+  } catch (error) {
+    console.log('Mobile init error:', error);
+  }
+};
+
 function App() {
+  useEffect(() => {
+    initMobile();
+  }, []);
+
   return (
     <Router>
       <AuthProvider>
         <SocketProvider>
+          <OfflineBanner />
           <AppRoutes />
         </SocketProvider>
       </AuthProvider>

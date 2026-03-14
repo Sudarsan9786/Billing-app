@@ -9,7 +9,7 @@ const PINPad = ({ onDigit, onBackspace, onClear }) => {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-3 p-4">
+    <div className="grid grid-cols-3 gap-4 p-4 justify-items-center">
       {digits.map((row, rowIndex) =>
         row.map((digit, colIndex) => {
           if (digit === null) {
@@ -21,9 +21,9 @@ const PINPad = ({ onDigit, onBackspace, onClear }) => {
               <button
                 key="backspace"
                 onClick={onBackspace}
-                className="h-14 rounded-xl bg-white border-2 border-slate-200 flex items-center justify-center active:scale-95 transition-transform"
+                className="h-16 w-16 rounded-full bg-white border-2 border-slate-200 flex items-center justify-center shadow-sm hover:shadow-md hover:border-primary/30 active:scale-[0.96] active:bg-primary/5 active:border-primary transition-all duration-150 p-4"
               >
-                <span className="material-symbols-outlined text-slate-700">backspace</span>
+                <span className="material-symbols-outlined text-slate-700 text-2xl">backspace</span>
               </button>
             );
           }
@@ -32,7 +32,7 @@ const PINPad = ({ onDigit, onBackspace, onClear }) => {
             <button
               key={digit}
               onClick={() => onDigit(digit)}
-              className="h-14 rounded-xl bg-white border-2 border-slate-200 text-2xl font-bold text-slate-900 active:scale-95 transition-transform hover:border-primary/50"
+              className="h-16 w-16 rounded-full bg-white border-2 border-slate-200 text-3xl font-bold text-slate-800 shadow-sm hover:shadow-md hover:border-primary/30 active:scale-[0.96] active:bg-primary/5 active:border-primary transition-all duration-150 select-none touch-manipulation flex items-center justify-center p-4"
             >
               {digit}
             </button>

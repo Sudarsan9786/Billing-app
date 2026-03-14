@@ -18,7 +18,11 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5001';
+      // Use live backend for mobile, localhost for web dev
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || 
+        (import.meta.env.MODE === 'production'
+          ? 'https://billing-app-zct8.onrender.com'
+          : 'http://localhost:5001');
       const newSocket = io(socketUrl);
 
       newSocket.on('connect', () => {
